@@ -24,6 +24,32 @@ header {
   border-radius: 8px;
 }
 
+/*login*/
+#login {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 25px;
+  background: #4F5D2F;
+  color:#CFD6EA;
+  border-radius: 8px;
+}
+
+/*logout
+
+#logout{
+  display: flex;
+  justify-content: center;
+}
+*/
+
+#logout-button {
+  display: block;
+  margin: 18px auto;
+  padding: 16px;
+  background-color: #1f2512;
+  color:#CFD6EA;
+}
+
 /* ID selector */
 #game-library {
   max-width: 1000px;

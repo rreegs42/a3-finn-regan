@@ -1,19 +1,23 @@
 require( 'dotenv' ).config()
+const cookieSession = require('cookie-session')
 const express = require('express')
 const app = express()
 const port = 3000
 
 const {MongoClient, ObjectId} = require('mongodb')
+//const { use } = require('react')
 const uri = `mongodb+srv://${process.env.USER}:${process.env.PASS}@${process.env.HOST}`
 console.log( 'uri:', uri )
 const client = new MongoClient( uri )
 
 
 let collection = null
+let usersCollection = null
 
 client.connect()
   .then(function() {
     collection = client.db('gametracker').collection('games')
+    usersCollection = client.db('gametracker').collection('users')
     console.log('Connected to mongodb')
   })
   .catch(function(error){
@@ -21,14 +25,31 @@ client.connect()
   })
 
 
-
-
 app.use(express.static('public'))
 app.use(express.json())
 
-app.get('/data', async function(req,res){
+app.use(cookieSession({
+  name: 'session',
+  keys: ['a3-finn-regan-secret']
+}))
 
-  const games = await collection.find({}).toArray()
+
+const requireLogin = function(req, res, next) {
+  if (req.session.user) {
+    next()
+  } else {
+    res.status(401).json({
+      success: false,
+      message: 'Must be logged in to view data'
+    })
+  }
+}
+
+app.get('/data', requireLogin, async function(req,res){
+
+  const games = await collection.find({
+    username: req.session.user
+  }).toArray()
   res.json(games)
 
 })
@@ -37,9 +58,74 @@ app.get('/', function(req,res){
   res.sendFile(__dirname + '/public/index.html')
 })
 
-app.post('/submit', async function(req, res) {
+
+app.post('/login', async function (req, res) {
+  const username = req.body.username
+  const password = req.body.password
+
+  const user = await usersCollection.findOne({
+    username: username
+  })
+
+  //creating a new user
+  if (user === null) {
+    await usersCollection.insertOne({
+      username: username,
+      password: password
+    })
+
+    req.session.user = username
+    
+    res.json({
+      success: true,
+      newAccount: true
+    })
+
+    //successful lofin with an existing user
+  } else if(user.password === password){
+    req.session.user = username
+
+    res.json({
+      success: true,
+      newAccount: false
+    })
+
+    //failed login with an existing user
+  } else {
+    res.status(401).json({
+      success: false,
+      message: 'Invalid username or password'
+    })
+  }
+})
+
+app.post('/logout', function(req, res) {
+  req.session = null
+
+  res.json({
+    success: true
+  })
+})
+
+app.get('/session', function(req, res) {
+  if(req.session.user){
+    res.json({
+      loggedIn: true,
+      username: req.session.user
+    })
+  } else {
+    res.json({
+      loggedIn: false
+    })
+  }
+})
+
+
+app.post('/submit', requireLogin, async function(req, res) {
 
   const data = req.body
+
+  const username = req.session.user
 
   console.log(data)
 
@@ -61,7 +147,8 @@ app.post('/submit', async function(req, res) {
     genre: data.genre,
     hours: data.hours,
     rating: data.rating,
-    recommendation: recommendation
+    recommendation: recommendation,
+    username: username
   }
 
   await collection.insertOne(newGame)
@@ -77,7 +164,8 @@ app.delete('/delete/:id', async function(req, res){
 
 
   await collection.deleteOne({
-    _id: new ObjectId(id)
+    _id: new ObjectId(id),
+    username: req.session.user
   })
 
   res.send('Game deleted')
@@ -106,7 +194,9 @@ app.put('/edit/:id', async function(req, res) {
   }
 
   const result = await collection.updateOne(
-    { _id: new ObjectId(id) },
+    { _id: new ObjectId(id),
+      username: req.session.user
+    },
     {
       $set: {
         name: data.name,

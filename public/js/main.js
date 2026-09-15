@@ -1,5 +1,4 @@
 // FRONT-END (CLIENT) JAVASCRIPT HERE
-
 let editingIndex = null
 
 const loadGames = async function() {
@@ -86,7 +85,7 @@ const editGame = async function ( event ) {
   document.querySelector('#hoursplayed').value = game.hours
   document.querySelector('#rating').value = game.rating
 
-  document.querySelector('form button').textContent = 'Save Changes'
+  document.querySelector('#add-game form button').textContent = 'Save Changes'
 
 
   const updatedGame = {
@@ -158,15 +157,90 @@ const submitGame = async function( event ) {
 
   editingIndex = null
 
-  document.querySelector('form button').textContent = 'Add Game'
+  document.querySelector('#add-game form button').textContent = 'Add Game'
 
   loadGames()
 
 }
 
-window.onload = function() {
-  loadGames();
+const loginUser = async function(event) {
+  event.preventDefault()
 
-const form = document.querySelector('form')
-form.onsubmit = submitGame
+  const username = document.querySelector('#username').value
+  const password = document.querySelector('#password').value
+
+  const response = await fetch('/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      username: username,
+      password: password
+    })
+  })
+
+  const result = await response.json()
+
+  if (result.success){
+
+    if(result.newAccount){
+      alert('A new account was created for you, ' + username + '.')
+    } else {
+      alert('login successful, ' + username + '.')
+    }
+    location.reload()
+  } else {
+    alert(result.message)
+  }
+}
+
+const logoutUser = async function() {
+  await fetch('/logout', {
+    method: 'POST'
+  })
+  alert('logged out of account.')
+  location.reload()
+}
+
+window.onload = async function() {
+
+  const response = await fetch('/session')
+  const session = await response.json()
+
+  console.log(session)
+
+  const addGame = document.querySelector('#add-game')
+  const login = document.querySelector('#login')
+  const logout = document.querySelector('#logout')
+  const gameLibrary = document.querySelector('#game-library')
+  const userInfo = document.querySelector('#user-info')
+
+  if(session.loggedIn) {
+    addGame.hidden = false
+    logout.hidden = false
+    gameLibrary.hidden = false
+    login.hidden = true
+    userInfo.textContent = 'Logged in as: ' + session.username
+
+    loadGames();
+  } else {
+    addGame.hidden = true
+    logout.hidden = true
+
+    gameLibrary.hidden = true
+    login.hidden = false
+    userInfo.textContent = 'Not currently logged in'
+  }
+
+ 
+
+  const form = document.querySelector('#add-game form')
+  form.onsubmit = submitGame
+
+  const loginForm = document.querySelector('#login-form')
+  loginForm.onsubmit = loginUser
+
+  const logoutButton = document.querySelector('#logout-button')
+  logoutButton.onclick = logoutUser
 }

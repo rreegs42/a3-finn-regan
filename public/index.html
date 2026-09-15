@@ -4,8 +4,9 @@
   <head>
     <meta charset='utf-8' />
     <meta name="viewport">
+    <meta name="description" content="Finn-Regan-A3 Game Tracker Website.">
     <title>Game Tracker</title>
-    <script src='js/main.js'></script>
+    <script src='js/main.js' defer></script>
     <link rel='stylesheet' href='css/main.css' />
     
     <!-- get rid of favicon error -->
@@ -17,11 +18,36 @@
     <header>
       <h1>Game Tracker</h1>
       <p>Keep track of the games you've played.</p>
+      <p id="user-info"></p>
     </header>
 
     <main>
 
-      <section id="add-game">
+      <section id="login">
+        <h2>Login</h2>
+
+        <form id="login-form">
+
+          <section class="form-row">
+            <label for="username">Username:</label>
+            <input type="text" id="username" required>
+          </section>
+
+          <section class="form-row">
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
+          </section>
+
+          <button>Login</button>
+
+        </form>
+      </section>
+
+      <section id="logout" hidden>
+        <button id="logout-button">Logout</button>
+      </section>
+
+      <section id="add-game" hidden>
         <h2>
           Add a Game
         </h2>
@@ -54,7 +80,7 @@
 
       </section>
 
-      <section id="game-library">
+      <section id="game-library" hidden>
 
         <h2>Game Library</h2>
 
