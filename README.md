@@ -8,15 +8,7 @@ Readme
 
 ## Game Tracker
 
-A link to your project running on render.
-
-Include a very brief summary of your project here. Images are encouraged, along with concise, high-level text. Be sure to include:
-
-- the goal of the application
-- challenges you faced in realizing the application
-- what authentication strategy you chose to use and why (choosing one because it seemed the easiest to implement is perfectly acceptable)
-- what CSS framework you used and why
-  - include any modifications to the CSS framework you made via custom CSS you authored
+https://a3-finn-regan.onrender.com/
 
 The goal of this website is to act as a personal library of games you've played, providing recommendations on if you like them or not. I struggled with designing the login system and managing how to only show the data of the currently logged-in user, but figured it out in the end. For authentication, users can create a username and password, and by hitting login, if that username isn't already taken, a new account is created. If it already exists, then the password is checked to ensure it is correct before logging in. I used the Bootstrap CSS framework. I opted to keep most of my CSS from A2 (since it was already clean and asthetic), but used the framework for my buttons (specifically the logout funtionality).
 
@@ -30,9 +22,10 @@ The goal of this website is to act as a personal library of games you've played,
 ## Technical Achievements
 - **Tech Achievement 1**: I achieved 100% on all 4 lighthouse tests. Note: for some reason, on my computer, when running in my regular browser, the performance score was not at 100. However, when running on the same computer in an incognito browser, the score was 100.
 
-- **Tech Achievement 2**: I used some Express middleware in my website; I used cookie-session to store users' login information so the browser remembers them.
-
 <img width="1917" height="875" alt="lighthouse" src="https://github.com/user-attachments/assets/8063e2bd-49c3-4e5c-8a12-c2948651f112" />
+
+
+- **Tech Achievement 2**: I used some Express middleware in my website; I used cookie-session to store users' login information so the browser remembers them.
 
 
 ### Design/Evaluation Achievements
